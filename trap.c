@@ -77,6 +77,13 @@ trap(struct trapframe *tf)
             cpuid(), tf->cs, tf->eip);
     lapiceoi();
     break;
+  case 14:
+    while(rcr2() < (KERNBASE - 1 - (myproc()->brk))){
+      cprintf("Expanding Stack!\n");
+      myproc()->brk += PGSIZE;
+      allocuvm(myproc()->pgdir, PGROUNDDOWN(KERNBASE-1-(myproc()->brk)), KERNBASE - 1 - (myproc()->brk));
+    }
+    break;
 
   //PAGEBREAK: 13
   default:
